@@ -4,7 +4,8 @@ var bodyParser = require("body-parser");
 var async = require("async");
 
 var app = express();
-var logFormat = "'[:date[iso]] - :remote-addr - :method :url :status :response-time ms - :res[content-length]b'";
+var logFormat = "'[:date[iso]] - :remote-addr - :method :url :status :response-t
+ime ms - :res[content-length]b'";
 app.use(morgan(logFormat));
 app.use(bodyParser.text({ type: '*/*' }));
 
@@ -12,15 +13,16 @@ const ReQuery = /^true$/i.test(process.env.REQUERY);
 const UseCORS = /^true$/i.test(process.env.CORS);
 const AmpCount = process.env.AMPCOUNT || 1;
 const BaudRate = parseInt(process.env.BAUDRATE || 9600);
-const SerialPort = require("serialport");
-const Readline = require('@serialport/parser-readline')
+const { SerialPort } = require("serialport");
+const { ReadlineParser } = require('@serialport/parser-readline')
 
 var device = process.env.DEVICE || "/dev/ttyUSB0";
-var connection = new SerialPort(device, {
-  baudRate: BaudRate,
+var connection = new SerialPort({ path: device,
+  baudRate: BaudRate
 });
 
-const parser = connection.pipe(new Readline({ delimiter: "\n", encoding: "ascii" }))
+const parser = connection.pipe(new ReadlineParser({ delimiter: "\n", encoding: "
+ascii" }))
 
 connection.on("open", function () {
   var zones = {};
@@ -30,7 +32,8 @@ connection.on("open", function () {
       connection.write("?" + i.toString() + "0\r");
       await async.until(
         function (callback) {
-          callback(null, typeof zones !== "undefined" && Object.keys(zones).length === (6 * i));
+          callback(null, typeof zones !== "undefined" && Object.keys(zones).leng
+th === (6 * i));
         },
         function (callback) { setTimeout(callback, 10); }
       );
@@ -47,7 +50,8 @@ connection.on("open", function () {
 
   UseCORS && app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Conten
+t-Type, Accept");
     next();
   });
 
@@ -56,7 +60,8 @@ connection.on("open", function () {
     if (data.startsWith('Command Error.')) { // returned from amp device
       process.exit(1);
     }
-    var zone = data.toString("ascii").match(/#>(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
+    var zone = data.toString("ascii").match(/#>(\d{2})(\d{2})(\d{2})(\d{2})(\d{2
+})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/);
     if (zone != null) {
       zones[zone[1]] = {
         "zone": zone[1],
@@ -82,7 +87,8 @@ connection.on("open", function () {
     }
     async.until(
       function (callback) {
-        callback(null, typeof zones !== "undefined" && Object.keys(zones).length === zoneCount);
+        callback(null, typeof zones !== "undefined" && Object.keys(zones).length
+ === zoneCount);
       },
       function (callback) {
         setTimeout(callback, 10);
@@ -113,7 +119,8 @@ connection.on("open", function () {
       queryControllers();
     }
     async.until(
-      function (callback) { callback(null, typeof zones[req.zone] !== "undefined"); },
+      function (callback) { callback(null, typeof zones[req.zone] !== "undefined
+"); },
       function (callback) {
         setTimeout(callback, 10);
       },
@@ -126,7 +133,8 @@ connection.on("open", function () {
   // Validate and standarize control attributes
   app.param('attribute', function (req, res, next, attribute) {
     if (typeof attribute !== 'string') {
-      res.status(500).send({ error: attribute + ' is not a valid zone control attribute' });
+      res.status(500).send({ error: attribute + ' is not a valid zone control at
+tribute' });
     }
     switch (attribute.toLowerCase()) {
       case "pa":
@@ -179,7 +187,8 @@ connection.on("open", function () {
         next();
         break;
       default:
-        res.status(500).send({ error: attribute + ' is not a valid zone control attribute' });
+        res.status(500).send({ error: attribute + ' is not a valid zone control
+attribute' });
     }
   });
 
@@ -189,7 +198,8 @@ connection.on("open", function () {
       connection.write("<" + req.zone + req.attribute + req.body + "\r");
       await async.until(
         function (callback) {
-          callback(null, typeof zones !== "undefined" && Object.keys(zones).length === 1);
+          callback(null, typeof zones !== "undefined" && Object.keys(zones).leng
+th === 1);
         },
         function (callback) { setTimeout(callback, 10); }
       );
@@ -197,7 +207,8 @@ connection.on("open", function () {
     writeAttribute();
     queryControllers();
     async.until(
-      function (callback) { callback(null, typeof zones[req.zone] !== "undefined"); },
+      function (callback) { callback(null, typeof zones[req.zone] !== "undefined
+"); },
       function (callback) {
         setTimeout(callback, 10);
       },
@@ -211,7 +222,8 @@ connection.on("open", function () {
     zones = {};
     queryControllers();
     async.until(
-      function (callback) { callback(null, typeof zones[req.zone] !== "undefined"); },
+      function (callback) { callback(null, typeof zones[req.zone] !== "undefined
+"); },
       function (callback) {
         setTimeout(callback, 10);
       },
