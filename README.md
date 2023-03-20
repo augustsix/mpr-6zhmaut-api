@@ -6,6 +6,7 @@ Monoprice sells this wacky [6 zone amp](https://www.monoprice.com/product?p_id=1
 [A detailed walk-through is available](https://chrisschuld.com/2019/07/decorating-the-monoprice-6-zone-home-audio-multizone-controller/) illustrating the process to use this API easily on a Raspberry Pi
 
 ## Installation
+Tested with node 16.19.1
 
     npm install
 
