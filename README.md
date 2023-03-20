@@ -1,6 +1,5 @@
 # mpr-6zhmaut-api
 
-> :warning: I no longer use this software, instead using [`remserial`](https://github.com/jnewland/remserial) and the [official Home Assistant integration](https://www.home-assistant.io/integrations/monoprice/) for the same device.
 
 Monoprice sells this wacky [6 zone amp](https://www.monoprice.com/product?p_id=10761) with a serial interface. This tiny project wraps the serial interface with a JSON API.
 
